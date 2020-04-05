@@ -1,0 +1,56 @@
+\documentclass[german,oneside,color]{htldipl}
+
+\graphicspath{{images/}}
+\include{Settings}
+\makeglossaries
+\loadglsentries{glossary}
+\addbibresource{literatur.bib} 
+
+\begin{document}
+\abteilung{Informatik}
+\schwerpunkt{} % eintragen, wenn vorhanden
+\studienort{Wiener Neustadt} \schule{HTBLuVA Wiener Neustadt}
+\schullogo{htl.jpeg} \abgabejahr{2019/20}
+\betreuerB{} \betreuerC{} \betreuerD{}
+\schuelerC{} \evidenzC{} \subthemaC{}
+\schuelerD{} \evidenzD{} \subthemaD{}
+\schuelerE{} \evidenzE{} \subthemaE{}
+
+%                                 wichtig
+\title{WireGuard}
+\schuelerA{Karlo PERANOVIC}
+\evidenzA{5BHIF-18}
+\subthemaA{WireGuard für Unterrichtseinsatz aufbereiten}
+\schuelerB{}
+\evidenzB{}
+\subthemaB{}
+\betreuerA{Dipl.-Ing. Dr. Günter Kolousek}
+
+\frontmatter
+\maketitle
+\tableofcontents
+
+% Hauptteil
+\mainmatter     
+\include{files/schrift}
+
+
+
+% Anhang
+\appendix
+\include{anhang_a}	
+
+% Automatisch:: Glossar, Index, Literaturverzeichnis; nichts ändern
+\clearpage
+\printglossaries
+\clearpage
+\chapter*{Index}
+\addcontentsline{toc}{chapter}{Index}
+\printindex[allgemein]
+\printindex
+\printindex[name]
+\printindex[title]
+\clearpage
+\addcontentsline{toc}{chapter}{\bibname}
+\printbibliography
+\end{document}
