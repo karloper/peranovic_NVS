@@ -1,18 +1,8 @@
 #include <iostream>
 #include "asio.hpp"
-//#include <ctime>
-#include <time.h>
 
 using namespace std;
 using namespace asio::ip;
-/*
-Hier schlage ich einen Zeitserver vor, der sich von =time.nist.gov= 
-mittels des daytime Protokolls die aktuelle Zeit holt 
-und diese in die lokale Zeit konvertiert (gemäß der lokalen Zeitzone) 
-
-und diese an den Client nach Verbindungsaufnahme in einer Zeile zurückliefert. 
-Danach wird die Verbindung geschlossen.
-*/
 
 
 int main() {
@@ -25,21 +15,24 @@ int main() {
    while(true) {
         tcp::iostream time_server{"time.nist.gov", "13"};
 
-        asio::ip::tcp::socket sock{ctx};
+        tcp::socket sock{ctx};
         acceptor.accept(sock);
-        asio::ip::tcp::iostream strm{move(sock)};
+        tcp::iostream strm{move(sock)};
         string data{""};
-
         if(time_server) {
             getline(time_server, data); // first line is empty
             getline(time_server, data);
+
+            // TEST: should return +2h -> next day
+            //data = "58945 20-04-06 23:30:09 50 0 0   2.8 UTC(NIST) *";
+            cout << "Data: " << data << endl;
         } else {
             cerr << "Could not fetch data from time.nist.gov server" << endl;
         }
 
         if(strm) {
             try {
-                strm << data;
+                strm << data; // pass time to clients
             } catch(...) {
                 cerr << "Could not send data without errors" << endl;
             }
