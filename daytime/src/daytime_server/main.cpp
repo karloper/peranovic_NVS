@@ -23,18 +23,23 @@ int main() {
     acceptor.listen();
 
    while(true) {
+        tcp::iostream time_server{"time.nist.gov", "13"};
+
         asio::ip::tcp::socket sock{ctx};
         acceptor.accept(sock);
         asio::ip::tcp::iostream strm{move(sock)};
+        string data{""};
+
+        if(time_server) {
+            getline(time_server, data); // first line is empty
+            getline(time_server, data);
+        } else {
+            cerr << "Could not fetch data from time.nist.gov server" << endl;
+        }
 
         if(strm) {
             try {
-                string h{"hello"};
-                strm << h;
-
-                
-                //strm << curr_time();
-                //strm << chrono::system_clock::now();
+                strm << data;
             } catch(...) {
                 cerr << "Could not send data without errors" << endl;
             }
@@ -44,4 +49,5 @@ int main() {
         
         strm.close();
     }
+    
 }
