@@ -1,0 +1,4 @@
+option('asio_include_dir', type : 'string', value : '/mnt/c/Users/karlo/Documents/asio/include/', description : 'the include dir of asio')
+option('spdlog_include_dir', type : 'string', value : '/mnt/c/Users/karlo/Documents/spdlog/spdlog/include/', description : 'the include dir of spdlog')
+option('timeutils_include_dir', type : 'string', value : '/mnt/c/Users/karlo/Documents/', description : 'the include dir of timeutils')
+option('cli_include_dir', type : 'string', value : '/mnt/c/Users/karlo/Documents/', description : 'the include dir of timeutils')
