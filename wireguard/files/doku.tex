@@ -15,12 +15,34 @@
 \end{figure}
 
 \section{Einführung} % Was kann ich damit machen?
+\label{einfuehrung}
 WireGuard ist ein extrem einfaches und dennoch schnelles und modernes VPN-Protkoll, welches eine sichere Lösung für das VPN-Tunneling bieten soll. Es ist darauf ausgelegt, leistungsfähiger, einfacher und nützlicher als die Konkurrenz z.B. IPsec, OpenVPN  zu sein. WireGuard ist als Allzweck-VPN konzipiert, das sowohl auf eingebetteten Schnittstellen als auch auf Supercomputern ausgeführt werden kann und für viele verschiedene Umstände geeignet ist.  \newline\newline
-Ursprünglich wurde WireGuard für den Linux-Kernel veröffentlicht, ist jedoch nun plattformübergreifend (Windows, MacOS, BSD, iOS, Android) weithin einsetzbar. Derzeit wird WireGuard stark weiterentwickelt, aber kann jetzt schon als die sicherste, benutzerfreundlichste und einfachste VPN-Lösung in der Branche angesehen werden.
+Ursprünglich wurde WireGuard für den Linux-Kernel veröffentlicht, ist jedoch nun plattformübergreifend (Windows, MacOS, BSD, iOS, Android) weitgehend einsetzbar. Derzeit wird WireGuard stark weiterentwickelt, aber kann jetzt schon als die sicherste, benutzerfreundlichste und einfachste VPN-Lösung in der Branche angesehen werden.
 
 \section{Installation} % Einsatz im Realen Alltag
+WireGuard kann wie in Abschnitt \ref{einfuehrung} beschrieben, auf vielen Betriebssystemen eingesetzt werden. Die Installation wird in weiterer Folge für das Betriebssystem Linux erklärt. \newline\newline
+Unter Ubuntu $\geq$ 19.10 erfolgt die Installation durch:
+\begin{lstlisting}
+$ sudo apt install wireguard
+\end{lstlisting}
+Ubuntu $\leq$ 19.04:
+\begin{lstlisting}
+$ sudo add-apt-repository ppa:wireguard/wireguard
+$ sudo apt-get update
+$ sudo apt-get install wireguard
+\end{lstlisting}
+
+\newpage  \noindent
+Debian:
+\begin{lstlisting}
+# apt install wireguard
+\end{lstlisting}
+Arch:
+\begin{lstlisting}
+$ sudo pacman -S wireguard-tools
+\end{lstlisting}
 
 \section{Verwendung} % Einsatz im Realen Alltag
 
-\section{Technische Funktionalität}
+\section{Technische Funktionalität} % Foto einfügen von VPN Tunneling? (von ko skripten)
 
