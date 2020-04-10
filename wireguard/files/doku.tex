@@ -11,7 +11,7 @@
 \begin{figure}[htbp]
   \centering
   \includesvg[scale=0.20]{images/wireguard.svg}
-  \caption{svg image}
+  \caption{WireGuard Logo}
 \end{figure}
 
 \section{Einführung} % Was kann ich damit machen?
@@ -43,6 +43,18 @@ $ sudo pacman -S wireguard-tools
 \end{lstlisting}
 
 \section{Verwendung} % Einsatz im Realen Alltag
+Im folgenden Abschnitt werde ich auf alle Schritte eingehen, die zur Konfiguration von WireGuard notwendig waren. Klar, es gibt immer mehrere Wege zu einem Ziel.
+\subsection{Vorbereitung}
+Um eine sinnvolle Funktionalität von WireGuard zu demonstrieren ist sowohl ein Server, als auch ein Client notwendig. Dazu habe ich in der Oracle Virtualbox zwei virtuelle Maschinen aufgesetzt. Auf einer VM lief ein \href{https://ubuntu.com/download/server}{Ubuntu Server} mit der Version 18.04.4, auf der anderen VM lief ein \href{https://ubuntu.com/download/desktop}{Ubuntu Desktop System} mit der Version 19.10. Der Vorgang zum Aufsetzen, erfolgt wie üblich. Ich empfehle lediglich dem Client mehr als 1GB RAM zuzuweisen, da er sonst während der Installation abstürzen kann. Zusätzlich sollte man die neueste Version von VirtualBox installieren, da in älteren Versionen offiziell Bugs bei der Kommunikation zwischen den VMs bestehen. Dies kann sonst einige Stunden Aufwand kosten :) .\newline
+Da zur Verwendung von WireGuard eine Kommunikation zwischen Client und Server und zum Internet notwendig ist, müssen ein paar Konfigurationen in der VirtualBox vorgenommen werden. Dazu muss bei beiden VMs auf den Netzwerk Adaptern \textit{NAT} ausgewählt sein (default). Beim Ubuntu Server muss man einen zusätzlichen Netwerkadapter aktivieren und ihn als \textit{Host-only} Adapter einstellen. \newline
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.75]{images/vm-nw.png}
+  \caption{Host-only Adapter}
+\end{figure} \noindent
+Es wird davon abgeraten ein eigenes NAT-Network zu konfigurieren, da in VirtualBox somit zwar eine Kommunikation zwischen den VMs funktioniert, jedoch keine Kommunikation zum Internet. 
 
+\subsection{Server}
+\subsection{Client}
 \section{Technische Funktionalität} % Foto einfügen von VPN Tunneling? (von ko skripten)
 
