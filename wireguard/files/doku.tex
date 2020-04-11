@@ -172,4 +172,35 @@ $ sudo wg-quick down wg0-client
 \end{lstlisting}
 aus erhält man wieder die ursprüngliche IP Adresse des Clients.
 \newpage
-\section{Technische Funktionalität}
+\section{Technische Funktionalität} % Foto einfügen von VPN Tunneling? (von ko skripten)
+\subsection{VPN}
+Als VPN (Virtual Private Network) bezeichnet man ein logisches privates Netzwerk, das auf einer öffentlichen Infrastruktur zugänglich ist. Ausschließlich Kommunikationspartner, die zu diesem privaten Netzwerk gehören, können miteinander kommunizieren.\newline
+Die Grundsätze von VPNs um eine sichere Kommunikation zu gewährleisten lauten:
+\begin{itemize}
+    \item \textbf{Authentizität} \newline
+    Eigenschaft, die gewährleistet, dass ein Kommunikationspartner tatsächlich derjenige ist, der er vorgibt zu sein.
+    \item \textbf{Vertraulichkeit} \newline
+    Schutz vor unbefugter Preisgabe von Information. Vertrauliche Daten dürfen ausschließlich den Kommunikationspartnern im privaten Netzwerk zugänglich sein.
+    \item \textbf{Integrität} \newline
+    Sicherstellung der Korrektheit von Daten.
+\end{itemize}
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.85]{images/vpn.jpg}
+  \caption{VPN Funktionsweise}
+\end{figure}
+\subsubsection{Ablauf VPN-Verbindung}
+\begin{enumerate}
+    \item Ein VPN-Client stellt eine Verbindung zu einem VPN-Server über ein VPN-Protokoll her.
+    \item Der VPN-Server überprüft die Zugangsdaten, nimmt die Verbindung dementsprechend an und einigt sich mit dem VPN-Client auf einen Schlüssel zur sicheren Kommunikation.
+    \item Es entsteht eine verschlüsselte Verbindung zwischen dem VPN-Server und dem VPN-Client, die auch als \textit{Tunnel} bezeichnet wird und eine physische Verbindung simuliert.
+    \item Der VPN-Client kann auf das lokale Netzwerk des VPN Servers zugreifen, als wäre er vor Ort mit diesem Netzwerk verbunden.
+\end{enumerate}
+
+
+%WireGuard arbeitet ausschließlich auf der 3. Schicht des OSI Modells.
+%\begin{figure}[H]
+%  \centering
+%  \includegraphics[scale=0.65]{images/osi.PNG}
+%  \caption{Osi Modell}
+%\end{figure}
