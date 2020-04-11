@@ -19,7 +19,8 @@
 WireGuard ist ein extrem einfaches und dennoch schnelles und modernes VPN-Protkoll, welches eine sichere Lösung für das VPN-Tunneling bieten soll. Es ist darauf ausgelegt, leistungsfähiger, einfacher und nützlicher als die Konkurrenz z.B. IPsec, OpenVPN  zu sein. WireGuard ist als Allzweck-VPN konzipiert, das sowohl auf eingebetteten Schnittstellen als auch auf Supercomputern ausgeführt werden kann und für viele verschiedene Umstände geeignet ist.  \newline\newline
 Ursprünglich wurde WireGuard für den Linux-Kernel veröffentlicht, ist jedoch nun plattformübergreifend (Windows, MacOS, BSD, iOS, Android) weitgehend einsetzbar. Derzeit wird WireGuard stark weiterentwickelt, aber kann jetzt schon als die sicherste, benutzerfreundlichste und einfachste VPN-Lösung in der Branche angesehen werden.
 
-\section{Installation} % Einsatz im Realen Alltag
+\section{Installation} 
+\label{installation}
 WireGuard kann wie in Abschnitt \ref{einfuehrung} beschrieben, auf vielen Betriebssystemen eingesetzt werden. Die Installation wird in weiterer Folge für das Betriebssystem Linux erklärt. \newline\newline
 Unter Ubuntu $\geq$ 19.10 erfolgt die Installation durch:
 \begin{lstlisting}
@@ -123,7 +124,52 @@ Um diese Änderungen zu übernehmen kann entweder der Server mit dem Befehl \tex
 sysctl -p
 echo 1 > /proc/sys/net/ipv4/ip_forward
 \end{lstlisting} \noindent
-Soweit so gut. Der Server ist nun konfiguriert.
+Soweit so gut. Der Server ist nun konfiguriert. \newline\newline
+WireGuard kann nun mit folgenden Befehl gestartet werden:
+\begin{lstlisting}
+$ wg-quick up wg0
+\end{lstlisting}
+Möchte man, dass WireGuard automatisch gestartet wird, sobald der Server gestartet wird, kann man das mit folgenden Befehl erreichen:
+\begin{lstlisting}
+$ systemctl enable wg-quick@wg0.service 
+\end{lstlisting}
+\newpage
 \subsection{Client}
-\section{Technische Funktionalität} % Foto einfügen von VPN Tunneling? (von ko skripten)
+Zuerst muss WireGuard installiert werden. Dieser Vorgang ist in Abschnitt \ref{installation} erklärt. Für Ubuntu 19.10 habe ich folgenden Befehl ausgeführt:
+\begin{lstlisting}
+$ sudo apt install wireguard
+\end{lstlisting} 
+ Anschließend wird für den Client ein private und public Key generiert.
+\begin{lstlisting}
+wg genkey | tee client_private_key | wg pubkey > client_public_key
+\end{lstlisting}
+Nun muss noch in der Server Konfigurationsdatei in Zeile 11 der Public Key des Clients eingetragen werden. \newline\newline
+Zuletzt wird wieder eine Konfigurationsdatei angelegt.
+\begin{lstlisting}
+$ vi /etc/wireguard/wg0-client.conf
+\end{lstlisting}
+Diese hat folgenden Inhalt:
+\begin{lstlisting}
+[Interface]
+Address = 10.100.100.2/32
+PrivateKey =
 
+[Peer]
+PublicKey =
+Endpoint = :51820
+AllowedIPs = 0.0.0.0/0
+PersistentKeepalive = 21
+\end{lstlisting}
+In Zeile 3 wird der Private Key des Clients eingetragen und in Zeile 6 der Public Key des Servers. Zeile 7 enthält zusätzlich noch die IP Adresse des Servers. \newline
+Wireguard ist nun am Client konfiguriert und kann mit folgenden Befehl gestartet werden:
+\begin{lstlisting}
+$ sudo wg-quick up wg0-client
+\end{lstlisting}
+Überprüft man nun die IP Adresse des Clients, stellt man fest, dass die IP Adresse des WireGuard Servers zu sehen ist, anstelle der ursprünglichen IP Adresse des Clients. \newline
+Führt man den Befehl
+\begin{lstlisting}
+$ sudo wg-quick down wg0-client
+\end{lstlisting}
+aus erhält man wieder die ursprüngliche IP Adresse des Clients.
+\newpage
+\section{Technische Funktionalität}
