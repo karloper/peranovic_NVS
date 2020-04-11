@@ -43,8 +43,9 @@ $ sudo pacman -S wireguard-tools
 \end{lstlisting}
 
 \section{Verwendung} % Einsatz im Realen Alltag
-Im folgenden Abschnitt werde ich auf alle Schritte eingehen, die zur Konfiguration von WireGuard notwendig waren. Klar, es gibt immer mehrere Wege zu einem Ziel.
-\subsection{Vorbereitung}
+Im folgenden Abschnitt werde ich auf alle Schritte eingehen, die zur Installation von WireGuard notwendig waren. Klar, es gibt immer mehrere Wege zu einem Ziel.
+\subsection{Vorbereitung} 
+\label{vorbereitung}
 Um eine sinnvolle Funktionalität von WireGuard zu demonstrieren ist sowohl ein Server, als auch ein Client notwendig. Dazu habe ich in der Oracle Virtualbox zwei virtuelle Maschinen aufgesetzt. Auf einer VM lief ein \href{https://ubuntu.com/download/server}{Ubuntu Server} mit der Version 18.04.4, auf der anderen VM lief ein \href{https://ubuntu.com/download/desktop}{Ubuntu Desktop System} mit der Version 19.10. Der Vorgang zum Aufsetzen, erfolgt wie üblich. Ich empfehle lediglich dem Client mehr als 1GB RAM zuzuweisen, da er sonst während der Installation abstürzen kann. Zusätzlich sollte man die neueste Version von VirtualBox installieren, da in älteren Versionen offiziell Bugs bei der Kommunikation zwischen den VMs bestehen. Dies kann sonst einige Stunden Aufwand kosten :) .\newline
 Da zur Verwendung von WireGuard eine Kommunikation zwischen Client und Server und zum Internet notwendig ist, müssen ein paar Konfigurationen in der VirtualBox vorgenommen werden. Dazu muss bei beiden VMs auf den Netzwerk Adaptern \textit{NAT} ausgewählt sein (default). Beim Ubuntu Server muss man einen zusätzlichen Netwerkadapter aktivieren und ihn als \textit{Host-only} Adapter einstellen. \newline
 \begin{figure}[H]
@@ -52,9 +53,77 @@ Da zur Verwendung von WireGuard eine Kommunikation zwischen Client und Server un
   \includegraphics[scale=0.75]{images/vm-nw.png}
   \caption{Host-only Adapter}
 \end{figure} \noindent
-Es wird davon abgeraten ein eigenes NAT-Network zu konfigurieren, da in VirtualBox somit zwar eine Kommunikation zwischen den VMs funktioniert, jedoch keine Kommunikation zum Internet. 
-
+Es wird davon abgeraten ein eigenes NAT-Network zu konfigurieren, da in VirtualBox somit zwar eine Kommunikation zwischen den VMs funktioniert, jedoch keine Kommunikation zum Internet, wordurch keine Installation von WireGuard möglich ist. \newpage \noindent
+Anschließend muss diesem neu angelegten Adapter eine IP-Adresse zugewiesen werden. Der Name des Adapters kann mit dem Befehl \textit{ifconfig -a} identifiziert werden. Unser gewünschter Adapter ist derjenige, der keine IP Adresse besitzt. In meinem Fall war das \textit{enp0s8}. Dazu kann mit dem Befehl 
+\begin{lstlisting}
+$ vi /etc/network/interfaces
+\end{lstlisting}
+dem Adapter folgenderweise eine IP-Adresse zugewiesen werden:
+\begin{lstlisting}
+auto enp0s8
+iface enp0s8 inet static
+address 192.168.56.10
+netmask 255.255.255.0
+\end{lstlisting}
+Zuletzt kann wieder der Befehl \textit{ifconfig} ausgeführt werden, der Folgendes zurückliefert:
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.7]{images/ifconfig.PNG}
+  \caption{IP Adressen der Netzwerkadapter}
+\end{figure} \noindent
 \subsection{Server}
+Sind nun die Schritte aus Abschnitt \ref{vorbereitung} ausgeführt, kann die Installation von WireGuard beginnen. Dazu sind der Server und der Client zu starten. Um WireGuard am Server zu installieren ist am Client folgender Befehl auszuführen:
+\begin{lstlisting}
+$ ssh <username>@192.168.56.103
+\end{lstlisting}
+Anschließend wurde mit folgenden Befehlen WireGuard am Server installiert:
+\begin{lstlisting}
+add-apt-repository ppa:wireguard/wireguard
+apt-get update
+apt-get install wireguard-dkms wireguard-tools linux-headers-$(uname -r)
+\end{lstlisting}
+Danach wurde mit folgenden Befehlen ein private und public Key generiert:
+\begin{lstlisting}
+umask 077
+wg genkey | tee server_private_key | wg pubkey > server_public_key
+\end{lstlisting}
+\newpage \noindent
+Um die Konfigurationen langfristig zu speichern kann mit dem Befehl
+\begin{lstlisting}
+$ vi /etc/wireguard/wg0.conf
+\end{lstlisting}
+eine Konfigurationsdatei erstellt werden, die folgenden Inhalt enthält:
+\begin{lstlisting}
+[Interface]
+Address = 10.100.100.1/24
+SaveConfig = true
+PrivateKey = 
+ListenPort = 51820
+PostUp = iptables -A FORWARDls -i %i -j ACCEPT; iptables -A FORWARD -o %i -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+
+PostDown = iptables -D FORWARD -i %i -j ACCEPT; iptables -D FORWARD -o %i -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
+
+[Peer]
+PublicKey = 
+AllowedIPs = 10.100.100.2/32
+\end{lstlisting}
+In Zeile 4 tragen wir den generierten Private Key des Servers ein. Zeile 11 bleibt vorerst so wie sie ist. \newline\newline
+Anschließend muss noch IPv4 forwarding erlaubt werden, um den Zugriff auf das gesamte LAN zu ermöglichen.
+Dazu ist folgender Befehl auszuführen:
+\begin{lstlisting}
+$ vi /etc/sysctl.conf
+\end{lstlisting}
+und in folgender Zeile den Befehl:
+\begin{lstlisting}
+net.ipv4.ip_forward=1
+\end{lstlisting}
+auszukommenntieren. \newline\newline
+Um diese Änderungen zu übernehmen kann entweder der Server mit dem Befehl \textit{reboot} neugestartet werden, oder mit folgenen Befehlen ohne eines Neustarts übernommen werden:
+\begin{lstlisting}
+sysctl -p
+echo 1 > /proc/sys/net/ipv4/ip_forward
+\end{lstlisting} \noindent
+Soweit so gut. Der Server ist nun konfiguriert.
 \subsection{Client}
 \section{Technische Funktionalität} % Foto einfügen von VPN Tunneling? (von ko skripten)
 
