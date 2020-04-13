@@ -196,11 +196,69 @@ Die Grundsätze von VPNs um eine sichere Kommunikation zu gewährleisten lauten:
     \item Es entsteht eine verschlüsselte Verbindung zwischen dem VPN-Server und dem VPN-Client, die auch als \textit{Tunnel} bezeichnet wird und eine physische Verbindung simuliert.
     \item Der VPN-Client kann auf das lokale Netzwerk des VPN Servers zugreifen, als wäre er vor Ort mit diesem Netzwerk verbunden.
 \end{enumerate}
+\newpage
+\noindent
+\section{Wireguard}
+WireGuard arbeitet ausschließlich auf der 3. Schicht des OSI Modells und bietet eine Unterstützung für IPv4 und IPv6. Zur Übertragung der verschlüsselten IP-Pakete wird UDP verwendet.
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.65]{images/osi.PNG}
+  \caption{Osi Modell}
+\end{figure}\noindent
+Vorteile:
+\begin{itemize}
+    \item einfache Nutzbarkeit
+    \item minimale Codebasis
+    \item Open Source
+    \item moderne Kryptographietechniken
+    \item Unterstützung vieler Betriebssysteme
+    \item schneller Verbindungsaufbau
+    \item schnelle Geschwindigkeit \newline
+    
+\end{itemize}
+Um ein hohes Sicherheitsniveau bei der Verschlüsselung der Daten zu erreichen, nutzt WireGuard moderne kryptographische Verfahren:
+\begin{itemize}
+    \item Curve25519 zum Schlüsselaustausch im Handshake mit Elliptic Curve Diffie-Hellman (ECDH)
+    \item ChaCha20 und Poly1305 für die symmetrische Verschlüsselung und den Austausch der Daten
+    \item BLAKE2s für die Hashfunktion
+    \item Ed25519 für die Zertifikate
+\end{itemize}
+\newpage \noindent
+Die Identität der VPN-Teilnehmern ist an ihren öffentlichen Schlüssel geknüpft. Damit können sich die Peers untereinander authentifizieren. WireGuard basiert auf einem Konzept namens \textit{Cryptokey-Routing}. Dabei ist für jeden Peer eine Tabelle mit den public Keys und Allowed IPs seiner Gegenstellen enthalten. Daraus leitet WireGuard eine interne Routing-Tabelle ab, die den Weg für jedes Paket kennt. Verbindungen werden ähnlich wie bei SSH durch den Austausch der öffentlichen Schlüssel aufgebaut. Dabei setzt WireGuard nicht auf eine klassische Client-Server Architektur, sondern erzeugt ein Peer-to-Peer Netzwerk. Die Verbindung zwischen zwei Peers realisiert WireGuard über einen einzelnen, frei wählbaren UDP-Port. Wird kein Port angegeben, beginnt WireGuard bei 51820/UDP.
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.75]{images/peer2peer.png}
+  \caption{Peer to Peer vs. Client/Server Architektur}
+\end{figure} 
+\noindent Beispiel für Verschlüsseln eines Pakets:
+\begin{enumerate}
+    \item Es soll ein Paket an die IP Adresse 192.168.30.8 geschickt werden. WireGuard überprüft, welchem Peer diese IP Adresse entspricht. 
+    \item Wird dieser Vorgang erfolgreich durchgeführt, erfolgt eine Verschlüsselung des IP Pakets mit dessen Public Key. Sonst wird das Paket verworfen.
+    \item WireGuard überprüft den öffentlichen Endpoint von diesem Client. Dieser ist beispielsweise Port 53133 mit 216.58.211.110.
+    \item Das verschlüsselte Paket aus Punkt 2 wird nun an den Endpoint 216.58.211.110:53133 durch UDP weitergeleitet.\newline
+\end{enumerate}
+Beispiel für Entschlüsseln eines Pakets:
+\begin{enumerate}
+    \item Empfängt ein WireGuard Peer ein Paket, wird dieses durch den eigenen private Key entschlüsselt.
+    \item Wird dieser Vorgang erfolgreich durchgeführt und für einen bekannten Peer X authentifiziert, wird sein letzter öffentlicher Endpoint ermittelt.
+    \item Das entschlüsselte Paket enthält das Klartext Paket von der IP Adresse 192.168.43.89. Nun wird geprüft, ob der Peer X diesem Peer Pakete der IP Adresse 192.168.43.89 schicken darf. 
+    \item Wenn die Prüfung erfolgreich ist, wird das Paket akzeptiert. Sonst wird das Paket verworfen.
 
+\end{enumerate}
+\newpage \noindent
+Performance Tests (Abbildung \ref{performance}) zeigen, dass WireGuard wesentlich leistungsfähiger als die Konkurrenten IPsec und OpenVPN abschließt. Im Gegensatz zu diesen Protokollen, welche hunderttausende LOC haben, enthält WireGuard bloß 4000 Zeilen. Dies ist aus zwei Gründen ein großer Sicherheits Vorteil: Zum einen enthält weniger Code auch potenziell weniger Fehler. Zum anderen sind dadurch potentielle Schwachstellen schneller zu finden. Einen weiteren Performance Schub bekommt WireGuard dadurch, dass die Software serverseitig als Linux-Kernelmodul ausgeführt wird.
+Außerdem wurde WireGuard unter der GPLv2 Lizenz veröffentlicht und ist somit kostenlos einsetzbar.
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.65]{images/performance.PNG}
+  \caption{WireGuard Performancevergleich}
+  \label{performance}
+\end{figure}
 
-%WireGuard arbeitet ausschließlich auf der 3. Schicht des OSI Modells.
-%\begin{figure}[H]
-%  \centering
-%  \includegraphics[scale=0.65]{images/osi.PNG}
-%  \caption{Osi Modell}
-%\end{figure}
+Nachteile:
+\begin{itemize}
+    \item experimentelle Entwicklung \newline
+    Obwohl WireGuard schon benutzbar ist, ist die Entwicklung einer stabilen Version noch nicht abgeschlossen und muss noch Sicherheitsaudits durchlaufen, in denen Experten die Codequalität überprüfen.
+    \item eingeschränkte Anonymität \newline
+    WireGuard unterstützt keine dynamische Adressverwaltung, wodurch dem Client im Vorhinein eine vordefinierte IP Adresse zugewiesen werden muss, welche auf jedem Server mit dem entsprechenden Schlüssel verknüpft ist.
+\end{itemize}
