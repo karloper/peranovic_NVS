@@ -224,7 +224,7 @@ Um ein hohes Sicherheitsniveau bei der Verschlüsselung der Daten zu erreichen, 
     \item Ed25519 für die Zertifikate
 \end{itemize}
 \newpage \noindent
-Die Identität der VPN-Teilnehmern ist an ihren öffentlichen Schlüssel geknüpft. Damit können sich die Peers untereinander authentifizieren. WireGuard basiert auf einem Konzept namens \textit{Cryptokey-Routing}. Dabei ist für jeden Peer eine Tabelle mit den public Keys und Allowed IPs seiner Gegenstellen enthalten. Daraus leitet WireGuard eine interne Routing-Tabelle ab, die den Weg für jedes Paket kennt. Verbindungen werden ähnlich wie bei SSH durch den Austausch der öffentlichen Schlüssel aufgebaut. Dabei setzt WireGuard nicht auf eine klassische Client-Server Architektur, sondern erzeugt ein Peer-to-Peer Netzwerk. Die Verbindung zwischen zwei Peers realisiert WireGuard über einen einzelnen, frei wählbaren UDP-Port. Wird kein Port angegeben, beginnt WireGuard bei 51820/UDP.
+Die Identität der VPN-Teilnehmer ist an ihren öffentlichen Schlüssel geknüpft. Damit können sich die Peers untereinander authentifizieren. WireGuard basiert auf einem Konzept namens \textit{Cryptokey-Routing}. Dabei ist für jeden Peer eine Tabelle mit den public Keys und Allowed IPs seiner Gegenstellen enthalten. Daraus leitet WireGuard eine interne Routing-Tabelle ab, die den Weg für jedes Paket kennt. Verbindungen werden ähnlich wie bei SSH durch den Austausch der öffentlichen Schlüssel aufgebaut. Dabei setzt WireGuard nicht auf eine klassische Client-Server Architektur, sondern erzeugt ein Peer-to-Peer Netzwerk. Die Verbindung zwischen zwei Peers realisiert WireGuard über einen einzelnen, frei wählbaren UDP-Port. Wird kein Port angegeben, beginnt WireGuard bei 51820/UDP.
 \begin{figure}[H]
   \centering
   \includegraphics[scale=0.75]{images/peer2peer.png}
@@ -262,3 +262,50 @@ Nachteile:
     \item eingeschränkte Anonymität \newline
     WireGuard unterstützt keine dynamische Adressverwaltung, wodurch dem Client im Vorhinein eine vordefinierte IP Adresse zugewiesen werden muss, welche auf jedem Server mit dem entsprechenden Schlüssel verknüpft ist.
 \end{itemize}
+\newpage
+\section{Einsatz im Container}
+Es besteht die Möglichkeit WireGuard in einem Docker Container zu verwenden. In den folgenden Schritten wird dieser Vorgang erklärt:
+\begin{enumerate}
+    \item \href{https://docs.docker.com/docker-for-windows/install/}{Docker} installieren
+    \item docker-compose Datei erstellen \newline
+    \begin{lstlisting}
+    version: "2"
+    services:
+     vpn:
+      image: cmulk/wireguard-docker:buster
+      volumes:
+       - data:/etc/wireguard
+      networks:
+       - net
+      ports:
+       - 5555:5555/udp
+      restart: unless-stopped
+      cap_add:
+       - NET_ADMIN
+       - SYS_MODULE
+    
+    networks:
+      net:
+    
+    volumes:
+     data:
+      driver: local
+    \end{lstlisting}
+    \item Projekt builden
+    \begin{lstlisting}
+    git clone https://github.com/cmulk/wireguard-docker.git
+    cd wireguard-docker
+    git checkout stretch 
+    
+    docker build -t wireguard:local .
+    \end{lstlisting}
+    \item Projekt zum 1. Mal ausführen
+    \begin{lstlisting}
+    docker run -it --rm --cap-add sys_module -v /lib/modules:/lib/modules cmulk/wireguard-docker:buster install-module 
+    \end{lstlisting}
+\end{enumerate}
+Nach dem das Projekt bereits einmal ausgeführt wurde, erfolgt dies für die nächsten Runs mit dem Befehl:
+\begin{lstlisting}
+docker run --cap-add net_admin --cap-add sys_module -v <config volume or host dir>:/etc/wireguard -p <externalport>:<dockerport>/udp cmulk/wireguard-docker:buster
+\end{lstlisting}
+
