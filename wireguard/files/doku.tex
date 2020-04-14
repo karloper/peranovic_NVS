@@ -16,7 +16,7 @@
 
 \section{Einführung} % Was kann ich damit machen?
 \label{einfuehrung}
-WireGuard ist ein extrem einfaches und dennoch schnelles und modernes VPN-Protkoll, welches eine sichere Lösung für das VPN-Tunneling bieten soll. Es ist darauf ausgelegt, leistungsfähiger, einfacher und nützlicher als die Konkurrenz z.B. IPsec, OpenVPN  zu sein. WireGuard ist als Allzweck-VPN konzipiert, das sowohl auf eingebetteten Schnittstellen als auch auf Supercomputern ausgeführt werden kann und für viele verschiedene Umstände geeignet ist.  \newline\newline
+WireGuard ist ein einfaches und dennoch schnelles und modernes VPN-Protkoll, welches eine sichere Lösung für das VPN-Tunneling bieten soll. Es ist darauf ausgelegt, leistungsfähiger, einfacher und nützlicher als die Konkurrenz z.B. IPsec und OpenVPN zu sein. WireGuard ist als Allzweck-VPN konzipiert, das sowohl auf eingebetteten Schnittstellen als auch auf Supercomputern ausgeführt werden kann und für viele verschiedene Umstände geeignet ist.  \newline\newline
 Ursprünglich wurde WireGuard für den Linux-Kernel veröffentlicht, ist jedoch nun plattformübergreifend (Windows, MacOS, BSD, iOS, Android) weitgehend einsetzbar. Derzeit wird WireGuard stark weiterentwickelt, aber kann jetzt schon als die sicherste, benutzerfreundlichste und einfachste VPN-Lösung in der Branche angesehen werden.
 
 \section{Installation} 
@@ -47,7 +47,7 @@ $ sudo pacman -S wireguard-tools
 Im folgenden Abschnitt werde ich auf alle Schritte eingehen, die zur Installation von WireGuard notwendig waren. Klar, es gibt immer mehrere Wege zu einem Ziel.
 \subsection{Vorbereitung} 
 \label{vorbereitung}
-Um eine sinnvolle Funktionalität von WireGuard zu demonstrieren ist sowohl ein Server, als auch ein Client notwendig. Dazu habe ich in der Oracle Virtualbox zwei virtuelle Maschinen aufgesetzt. Auf einer VM lief ein \href{https://ubuntu.com/download/server}{Ubuntu Server} mit der Version 18.04.4, auf der anderen VM lief ein \href{https://ubuntu.com/download/desktop}{Ubuntu Desktop System} mit der Version 19.10. Der Vorgang zum Aufsetzen, erfolgt wie üblich. Ich empfehle lediglich dem Client mehr als 1GB RAM zuzuweisen, da er sonst während der Installation abstürzen kann. Zusätzlich sollte man die neueste Version von VirtualBox installieren, da in älteren Versionen offiziell Bugs bei der Kommunikation zwischen den VMs bestehen. Dies kann sonst einige Stunden Aufwand kosten :) .\newline
+Um eine sinnvolle Funktionalität von WireGuard zu demonstrieren ist sowohl ein Server, als auch ein Client notwendig. Dazu habe ich in der Oracle VirtualBox zwei virtuelle Maschinen aufgesetzt. Auf einer VM lief ein \href{https://ubuntu.com/download/server}{Ubuntu Server} mit der Version 18.04.4, auf der anderen VM lief ein \href{https://ubuntu.com/download/desktop}{Ubuntu Desktop System} mit der Version 19.10. Der Vorgang zum Aufsetzen, erfolgt wie üblich. Ich empfehle lediglich dem Client mehr als 1GB RAM zuzuweisen, da er sonst während der Installation abstürzen kann. Zusätzlich sollte man die neueste Version von VirtualBox installieren, da in älteren Versionen offiziell Bugs bei der Kommunikation zwischen den VMs bestehen. Dies kann sonst einige Stunden Aufwand kosten :) .\newline
 Da zur Verwendung von WireGuard eine Kommunikation zwischen Client und Server und zum Internet notwendig ist, müssen ein paar Konfigurationen in der VirtualBox vorgenommen werden. Dazu muss bei beiden VMs auf den Netzwerk Adaptern \textit{NAT} ausgewählt sein (default). Beim Ubuntu Server muss man einen zusätzlichen Netwerkadapter aktivieren und ihn als \textit{Host-only} Adapter einstellen. \newline
 \begin{figure}[H]
   \centering
@@ -55,7 +55,7 @@ Da zur Verwendung von WireGuard eine Kommunikation zwischen Client und Server un
   \caption{Host-only Adapter}
 \end{figure} \noindent
 Es wird davon abgeraten ein eigenes NAT-Network zu konfigurieren, da in VirtualBox somit zwar eine Kommunikation zwischen den VMs funktioniert, jedoch keine Kommunikation zum Internet, wordurch keine Installation von WireGuard möglich ist. \newpage \noindent
-Anschließend muss diesem neu angelegten Adapter eine IP-Adresse zugewiesen werden. Der Name des Adapters kann mit dem Befehl \textit{ifconfig -a} identifiziert werden. Unser gewünschter Adapter ist derjenige, der keine IP Adresse besitzt. In meinem Fall war das \textit{enp0s8}. Dazu kann mit dem Befehl 
+Anschließend muss diesem neu angelegten Adapter eine IP-Adresse zugewiesen werden. Der Name des Adapters kann durch den Befehl \textit{ifconfig -a} identifiziert werden. Unser gewünschter Adapter ist derjenige, der keine IP Adresse besitzt. In meinem Fall war das \textit{enp0s8}. Dazu kann mit dem Befehl 
 \begin{lstlisting}
 $ vi /etc/network/interfaces
 \end{lstlisting}
@@ -63,7 +63,7 @@ dem Adapter folgenderweise eine IP-Adresse zugewiesen werden:
 \begin{lstlisting}
 auto enp0s8
 iface enp0s8 inet static
-address 192.168.56.10
+address 192.168.56.103
 netmask 255.255.255.0
 \end{lstlisting}
 Zuletzt kann wieder der Befehl \textit{ifconfig} ausgeführt werden, der Folgendes zurückliefert:
