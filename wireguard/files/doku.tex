@@ -263,6 +263,35 @@ Nachteile:
     WireGuard unterstützt keine dynamische Adressverwaltung, wodurch dem Client im Vorhinein eine vordefinierte IP Adresse zugewiesen werden muss, welche auf jedem Server mit dem entsprechenden Schlüssel verknüpft ist.
 \end{itemize}
 \newpage
+\section{Docker}
+In der heutigen Zeit möchte man Software zwischen unterschiedlichen Plattformen und
+Infrastrukturen bewegen, ohne ständig die Vorraussetzungen für das Deployment und den Betrieb
+anzupassen.\newline
+Docker gibt uns die Möglichkeit mithilfe von Container-Technologie, Anwendungen in
+verschiedensten Umgebungen mit den unterschiedlichsten Vorraussetzungen auszuführen, ohne
+dafür das komplette System virtualisieren zu müssen.
+\section{Vorteile}
+Die Plattform bietet die Möglichkeit unsere Applikation in eine isolierte Umgebung zu verpacken,
+gennant \textit{Container}. Container benötigen weit weniger Ressourcen als z.B. eine Virtuelle
+Maschine. Warum dies so ist, wird in der Erklärung der Container-Technologie näher erläutert.
+Diese Umgebung verändert sich nicht, was bedeutet, dass keine Inkonsistenzen auftreten und die
+Applikation immer in der exakt gleichen Umgebung läuft.
+Docker ist somit durch seine Container-Technologie im Hinblick auf Systemressourcen weitaus
+effizienter und modularer als eine Virtuelle Maschine.
+\subsection{Image}
+Ein Image ist ein Template mit verschiedenen Konfigurationen für einen Container. Meist basiert
+ein Image auf einem anderen, enthält jedoch zusätzliche Anpassungen.
+Ein Image wird durch ein sogenanntes “Dockerfile” dargestellt.
+\subsection{Container}
+Ein Container ist eine Instanz eines Images.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.35]{images/docker.PNG}
+  \caption{Docker Build Prozess}
+  \label{performance}
+\end{figure}
+
 \section{Einsatz im Container}
 Es besteht die Möglichkeit WireGuard in einem Docker Container zu verwenden. In den folgenden Schritten wird dieser Vorgang erklärt:
 \begin{enumerate}
