@@ -278,6 +278,22 @@ Diese Umgebung verändert sich nicht, was bedeutet, dass keine Inkonsistenzen au
 Applikation immer in der exakt gleichen Umgebung läuft.
 Docker ist somit durch seine Container-Technologie im Hinblick auf Systemressourcen weitaus
 effizienter und modularer als eine Virtuelle Maschine.
+\subsection{Container Technologie}
+Docker basiert auf der Container-Technologie. Die Grafik \ref{contTech} vergleicht eine Virtuelle Maschine mit
+einer Container Engine. Bei einer virtuellen Maschine wird ein Hypervisor benötigt, auf welchem die VMs laufen. In einer VM wird das gesamte Betriebssystem virtualisiert und auf diesem Betriebssystem läuft dann
+unsere Applikation. Die Container Technologie funktioniert so, dass auf dem Host Betriebssystem eine sogenannte
+Container Engine läuft (in unserem Fall die Docker Engine), auf der sich wiederum die Container
+befinden. Anstatt also die komplette Hardware zu virtualisieren, wie es bei VMs der Fall ist, werden bei
+einem Docker Container nur die benötigten Binaries/Libraries virtualisiert, welche für die
+Anwendung, die am Container laufen soll, benötigt werden.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.35]{images/containertech.jpg}
+  \caption{Docker vs VM}
+  \label{contTech}
+\end{figure}
+
 \subsection{Image}
 Ein Image ist ein Template mit verschiedenen Konfigurationen für einen Container. Meist basiert
 ein Image auf einem anderen, enthält jedoch zusätzliche Anpassungen.
