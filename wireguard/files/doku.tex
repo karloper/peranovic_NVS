@@ -165,7 +165,7 @@ Wireguard ist nun am Client konfiguriert und kann mit folgenden Befehl gestartet
 \begin{lstlisting}
 $ sudo wg-quick up wg0-client
 \end{lstlisting}
-Überprüft man nun die IP Adresse des Clients, stellt man fest, dass die IP Adresse des WireGuard Servers zu sehen ist, anstelle der ursprünglichen IP Adresse des Clients. \newline
+Überprüft man nun die IP Adresse des Clients, stellt man fest, dass die IP Adresse des WireGuard Servers zu sehen ist, anstelle der ursprünglichen IP Adresse des Clients. Das bedeutet, dass die IP Adresse des Clients nun nicht mehr öffentlich sichtbar ist und unser VPN Server korrekt funktioniert. Näher wird darauf in Abschnitt 1.4.1 eingegangen. \newline \newline
 Führt man den Befehl
 \begin{lstlisting}
 $ sudo wg-quick down wg0-client
@@ -293,7 +293,6 @@ Anwendung, die am Container laufen soll, benötigt werden.
   \caption{Docker vs VM}
   \label{contTech}
 \end{figure}
-
 \subsection{Image}
 Ein Image ist ein Template mit verschiedenen Konfigurationen für einen Container. Meist basiert
 ein Image auf einem anderen, enthält jedoch zusätzliche Anpassungen.
