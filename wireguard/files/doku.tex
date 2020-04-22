@@ -55,7 +55,7 @@ Da zur Verwendung von WireGuard eine Kommunikation zwischen Client und Server un
   \caption{Host-only Adapter}
 \end{figure} \noindent
 Es wird davon abgeraten ein eigenes NAT-Network zu konfigurieren, da in VirtualBox somit zwar eine Kommunikation zwischen den VMs funktioniert, jedoch keine Kommunikation zum Internet, wordurch keine Installation von WireGuard möglich ist. \newpage \noindent
-Anschließend muss diesem neu angelegten Adapter eine IP-Adresse zugewiesen werden. Der Name des Adapters kann durch den Befehl \textit{ifconfig -a} identifiziert werden. Unser gewünschter Adapter ist derjenige, der keine IP Adresse besitzt. In meinem Fall war das \textit{enp0s8}. Dazu kann mit dem Befehl 
+Anschließend muss diesem neu angelegten Adapter im Server eine IP-Adresse zugewiesen werden. Der Name des Adapters kann durch den Befehl \textit{ifconfig -a} identifiziert werden. Unser gewünschter Adapter ist derjenige, der keine IP Adresse besitzt. In meinem Fall war das \textit{enp0s8}. Dazu kann mit dem Befehl 
 \begin{lstlisting}
 $ vi /etc/network/interfaces
 \end{lstlisting}
@@ -88,6 +88,9 @@ Danach wurde mit folgenden Befehlen ein private und public Key generiert:
 umask 077
 wg genkey | tee server_private_key | wg pubkey > server_public_key
 \end{lstlisting}
+Daraus ergibt sich Folgendes: \newline
+\textbf{private key}: +ALlz47V8oFmroNDNXB3GusLEpjpl8oHu6/1x/Lmr3Y=\newline
+\textbf{public key}: oYnqorCOyXKWInOQBKCLu6avKZYtgdPItSNwyQgHGmo=\newline
 \newpage \noindent
 Um die Konfigurationen langfristig zu speichern kann mit dem Befehl
 \begin{lstlisting}
@@ -98,17 +101,17 @@ eine Konfigurationsdatei erstellt werden, die folgenden Inhalt enthält:
 [Interface]
 Address = 10.100.100.1/24
 SaveConfig = true
-PrivateKey = 
+PrivateKey = +ALlz47V8oFmroNDNXB3GusLEpjpl8oHu6/1x/Lmr3Y=
 ListenPort = 51820
 PostUp = iptables -A FORWARDls -i %i -j ACCEPT; iptables -A FORWARD -o %i -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 
 PostDown = iptables -D FORWARD -i %i -j ACCEPT; iptables -D FORWARD -o %i -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
 
 [Peer]
-PublicKey = 
+PublicKey = xGshpOf4b256g1ZYxYfnvUq8sdzVKvc12pig2jUJoz4=
 AllowedIPs = 10.100.100.2/32
 \end{lstlisting}
-In Zeile 4 tragen wir den generierten Private Key des Servers ein. Zeile 11 bleibt vorerst so wie sie ist. \newline\newline
+In Zeile 4 tragen wir den generierten Private Key des Servers ein. Zeile 11 ignorieren wir vorerst. Wie man sieht werden hier alle Peers mit denen eine Kommunikation aufgebaut werden darf aufgelistet. Dieser wird jedes mal mit einem [Peer] eingeleitet, gefolgt von seinem PublicKey und den erlaubten IP Adressen mit denen kommuniziert werden darf. \newline\newline
 Anschließend muss noch IPv4 forwarding erlaubt werden, um den Zugriff auf das gesamte LAN zu ermöglichen.
 Dazu ist folgender Befehl auszuführen:
 \begin{lstlisting}
@@ -143,6 +146,9 @@ $ sudo apt install wireguard
 \begin{lstlisting}
 wg genkey | tee client_private_key | wg pubkey > client_public_key
 \end{lstlisting}
+Daraus ergibt sich Folgendes:\newline
+\textbf{private key}: iGIUm+xAylOFtOLEcBKVWKAs29Y8Snj6QuNfN9C301E= \newline
+\textbf{public key}: xGshpOf4b256g1ZYxYfnvUq8sdzVKvc12pig2jUJoz4= \newline
 Nun muss noch in der Server Konfigurationsdatei in Zeile 11 der Public Key des Clients eingetragen werden. \newline\newline
 Zuletzt wird wieder eine Konfigurationsdatei angelegt.
 \begin{lstlisting}
@@ -152,11 +158,11 @@ Diese hat folgenden Inhalt:
 \begin{lstlisting}
 [Interface]
 Address = 10.100.100.2/32
-PrivateKey =
+PrivateKey = iGIUm+xAylOFtOLEcBKVWKAs29Y8Snj6QuNfN9C301E=
 
 [Peer]
-PublicKey =
-Endpoint = :51820
+PublicKey = oYnqorCOyXKWInOQBKCLu6avKZYtgdPItSNwyQgHGmo=
+Endpoint = 192.168.56.103:51820
 AllowedIPs = 0.0.0.0/0
 PersistentKeepalive = 21
 \end{lstlisting}
@@ -165,15 +171,15 @@ Wireguard ist nun am Client konfiguriert und kann mit folgenden Befehl gestartet
 \begin{lstlisting}
 $ sudo wg-quick up wg0-client
 \end{lstlisting}
-Überprüft man nun die IP Adresse des Clients, stellt man fest, dass die IP Adresse des WireGuard Servers zu sehen ist, anstelle der ursprünglichen IP Adresse des Clients. Das bedeutet, dass die IP Adresse des Clients nun nicht mehr öffentlich sichtbar ist und unser VPN Server korrekt funktioniert. Näher wird darauf in Abschnitt 1.4.1 eingegangen. \newline \newline
+Überprüft man nun die IP Adresse des Clients, stellt man fest, dass die IP Adresse des WireGuard Servers zu sehen ist, anstelle der ursprünglichen IP Adresse des Clients. Das bedeutet, dass die IP Adresse des Clients nun nicht mehr öffentlich sichtbar ist und unser VPN Server korrekt funktioniert. Näher wird darauf in Abschnitt \ref{vpn} eingegangen. \newline \newline
 Führt man den Befehl
 \begin{lstlisting}
 $ sudo wg-quick down wg0-client
 \end{lstlisting}
 aus erhält man wieder die ursprüngliche IP Adresse des Clients.
 \newpage
-\section{Technische Funktionalität} % Foto einfügen von VPN Tunneling? (von ko skripten)
-\subsection{VPN}
+\section{Technische Funktionalität} 
+\subsection{VPN} \label{vpn}
 Als VPN (Virtual Private Network) bezeichnet man ein logisches privates Netzwerk, das auf einer öffentlichen Infrastruktur zugänglich ist. Ausschließlich Kommunikationspartner, die zu diesem privaten Netzwerk gehören, können miteinander kommunizieren.\newline
 Die Grundsätze von VPNs um eine sichere Kommunikation zu gewährleisten lauten:
 \begin{itemize}
@@ -273,7 +279,7 @@ dafür das komplette System virtualisieren zu müssen.
 \section{Vorteile}
 Die Plattform bietet die Möglichkeit unsere Applikation in eine isolierte Umgebung zu verpacken,
 gennant \textit{Container}. Container benötigen weit weniger Ressourcen als z.B. eine Virtuelle
-Maschine. Warum dies so ist, wird in der Erklärung der Container-Technologie näher erläutert.
+Maschine. Der Grund dafür, wird in der Erklärung der Container-Technologie näher erläutert.
 Diese Umgebung verändert sich nicht, was bedeutet, dass keine Inkonsistenzen auftreten und die
 Applikation immer in der exakt gleichen Umgebung läuft.
 Docker ist somit durch seine Container-Technologie im Hinblick auf Systemressourcen weitaus
@@ -333,8 +339,7 @@ Es besteht die Möglichkeit WireGuard in einem Docker Container zu verwenden. In
     
     volumes:
      data:
-      driver: local
-    \end{lstlisting}
+      driver: local\end{lstlisting}
     \item Projekt builden
     \begin{lstlisting}
     git clone https://github.com/cmulk/wireguard-docker.git
